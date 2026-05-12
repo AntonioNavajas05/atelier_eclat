@@ -138,71 +138,46 @@ textarea {
   text-transform: uppercase;
 }
 
-.gem-stage {
+.gem-canvas-stage {
   position: relative;
-  width: 48px;
-  height: 48px;
-  perspective: 520px;
+  display: block;
+  width: 78px;
+  height: 78px;
+  margin-left: 2px;
 }
 
-.gem-stage::after {
+.gem-canvas-stage::before {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: 3px;
-  width: 34px;
-  height: 10px;
+  top: 50%;
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(246, 191, 209, 0.32), rgba(246, 191, 209, 0.08) 48%, transparent 70%);
+  filter: blur(8px);
+  transform: translate(-50%, -50%);
+}
+
+.gem-canvas-stage::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 7px;
+  width: 48px;
+  height: 12px;
   border-radius: 999px;
   background: rgba(184, 137, 141, 0.22);
-  filter: blur(7px);
+  filter: blur(8px);
   transform: translateX(-50%);
 }
 
-.gem-3d {
-  position: absolute;
-  inset: 8px;
-  transform-style: preserve-3d;
-  animation: gemSpin 5.4s linear infinite;
-}
-
-.gem-face {
+.gem-canvas-stage canvas {
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(255, 255, 255, 0.78);
-  clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%);
-  background:
-    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.18) 22%, transparent 38%),
-    linear-gradient(145deg, rgba(255, 225, 235, 0.92), rgba(232, 165, 188, 0.82) 52%, rgba(186, 117, 145, 0.72));
-  box-shadow: inset -10px -12px 22px rgba(91, 46, 53, 0.13), inset 8px 8px 18px rgba(255, 255, 255, 0.38);
-}
-
-.gem-face.front {
-  transform: translateZ(12px);
-}
-
-.gem-face.back {
-  transform: rotateY(180deg) translateZ(12px);
-  opacity: 0.74;
-}
-
-.gem-face.left {
-  transform: rotateY(-72deg) translateZ(12px);
-  opacity: 0.86;
-}
-
-.gem-face.right {
-  transform: rotateY(72deg) translateZ(12px);
-  opacity: 0.86;
-}
-
-.gem-face.top {
-  transform: rotateX(72deg) translateZ(12px);
-  opacity: 0.9;
-}
-
-.gem-face.bottom {
-  transform: rotateX(-72deg) translateZ(12px);
-  opacity: 0.58;
+  width: 78px;
+  height: 78px;
+  filter: drop-shadow(0 18px 20px rgba(91, 46, 53, 0.18));
 }
 
 .icon-button {
@@ -448,15 +423,6 @@ textarea {
   }
 }
 
-@keyframes gemSpin {
-  from {
-    transform: rotateX(-14deg) rotateY(0deg) rotateZ(4deg);
-  }
-  to {
-    transform: rotateX(-14deg) rotateY(360deg) rotateZ(4deg);
-  }
-}
-
 @keyframes chatRise {
   from {
     opacity: 0;
@@ -492,7 +458,7 @@ textarea {
     letter-spacing: 0.2em;
   }
 
-  .gem-stage {
+  .gem-canvas-stage {
     display: none;
   }
 
