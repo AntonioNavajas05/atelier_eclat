@@ -118,6 +118,43 @@ function IconButton({ icon, label, count = 0, active = false, pulse = false, onC
   );
 }
 
+function BrandLogo() {
+  return (
+    <div className="brand-lockup">
+      <span className="brand-seal" aria-hidden="true">
+        <svg viewBox="0 0 72 72" className="brand-seal-svg">
+          <defs>
+            <linearGradient id="brandGold" x1="12" y1="8" x2="60" y2="64" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#f1dfb0" />
+              <stop offset="0.48" stopColor="#d8b878" />
+              <stop offset="1" stopColor="#b9934c" />
+            </linearGradient>
+          </defs>
+          <circle cx="36" cy="36" r="31" fill="#fffaf8" stroke="url(#brandGold)" strokeWidth="2.6" />
+          <path d="M20 48 33.5 20 47 48" fill="none" stroke="#5b2e35" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M27 39h13" stroke="#5b2e35" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M45 23v25h11" fill="none" stroke="#5b2e35" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M16 20c6-7 13-10 20-10s14 3 20 10" fill="none" stroke="#d8b878" strokeWidth="1.4" strokeLinecap="round" opacity="0.85" />
+        </svg>
+      </span>
+      <span className="brand-copy">
+        <span className="serif brand-name">Atelier Eclat</span>
+        <span className="brand-subtitle">bijoux boutique</span>
+      </span>
+      <span className="gem-stage" aria-hidden="true">
+        <span className="gem-3d">
+          <span className="gem-face front" />
+          <span className="gem-face back" />
+          <span className="gem-face left" />
+          <span className="gem-face right" />
+          <span className="gem-face top" />
+          <span className="gem-face bottom" />
+        </span>
+      </span>
+    </div>
+  );
+}
+
 function Header({ page, setPage, cartCount, wishlistCount, cartPulse }) {
   const [open, setOpen] = useState(false);
   const primaryNav = [
@@ -141,9 +178,8 @@ function Header({ page, setPage, cartCount, wishlistCount, cartPulse }) {
         Boutique de joyeria seleccionada - envio cuidado - regalo listo desde el primer clic
       </div>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <button onClick={() => goTo("home")} className="focus-ring text-left">
-          <span className="serif block text-3xl font-bold tracking-normal">Atelier Eclat</span>
-          <span className="text-xs uppercase tracking-[0.28em] text-rosewood">bijoux boutique</span>
+        <button onClick={() => goTo("home")} className="focus-ring text-left" aria-label="Atelier Eclat inicio">
+          <BrandLogo />
         </button>
         <nav className="hidden items-center gap-2 lg:flex" aria-label="Navegacion principal">
           {primaryNav.map(([key, label, icon]) => (
