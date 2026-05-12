@@ -23,15 +23,110 @@ function Button({ children, variant = "primary", className = "", ...props }) {
   );
 }
 
-function Header({ page, setPage, cartCount, wishlistCount }) {
+function Icon({ name, className = "h-5 w-5" }) {
+  const common = {
+    className,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.8",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": "true"
+  };
+  const paths = {
+    home: (
+      <>
+        <path d="M3 10.8 12 3l9 7.8" />
+        <path d="M5.4 9.2V21h13.2V9.2" />
+        <path d="M9.4 21v-6.2h5.2V21" />
+      </>
+    ),
+    catalog: (
+      <>
+        <path d="M5 5h14" />
+        <path d="M5 12h14" />
+        <path d="M5 19h14" />
+        <path d="M8 3v4" />
+        <path d="M16 10v4" />
+        <path d="M11 17v4" />
+      </>
+    ),
+    user: (
+      <>
+        <path d="M20 21a8 8 0 0 0-16 0" />
+        <circle cx="12" cy="8" r="4" />
+      </>
+    ),
+    heart: (
+      <path d="M20.8 5.9a5.2 5.2 0 0 0-7.4 0L12 7.3l-1.4-1.4a5.2 5.2 0 1 0-7.4 7.4L12 22l8.8-8.7a5.2 5.2 0 0 0 0-7.4Z" />
+    ),
+    cart: (
+      <>
+        <path d="M6 7h15l-1.8 8.4a2 2 0 0 1-2 1.6H9.1a2 2 0 0 1-2-1.7L5.6 4H3" />
+        <circle cx="9.5" cy="20" r="1.2" />
+        <circle cx="17.5" cy="20" r="1.2" />
+      </>
+    ),
+    menu: (
+      <>
+        <path d="M4 7h16" />
+        <path d="M4 12h16" />
+        <path d="M4 17h16" />
+      </>
+    ),
+    close: (
+      <>
+        <path d="M6 6l12 12" />
+        <path d="M18 6 6 18" />
+      </>
+    ),
+    bag: (
+      <>
+        <path d="M6 8h12l-1 13H7L6 8Z" />
+        <path d="M9 8a3 3 0 0 1 6 0" />
+      </>
+    ),
+    sparkle: (
+      <>
+        <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z" />
+        <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z" />
+      </>
+    )
+  };
+  return <svg {...common}>{paths[name]}</svg>;
+}
+
+function IconButton({ icon, label, count = 0, active = false, pulse = false, onClick, className = "" }) {
+  return (
+    <button
+      className={`focus-ring icon-button ${active ? "active" : ""} ${pulse ? "cart-pulse" : ""} ${className}`}
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+    >
+      <Icon name={icon} />
+      {count > 0 && <span className="nav-badge">{count}</span>}
+    </button>
+  );
+}
+
+function Header({ page, setPage, cartCount, wishlistCount, cartPulse }) {
   const [open, setOpen] = useState(false);
-  const nav = [
-    ["home", "Inicio"],
-    ["catalog", "Catalogo"],
-    ["account", "Mi cuenta"],
-    ["wishlist", `Wishlist ${wishlistCount ? `(${wishlistCount})` : ""}`],
-    ["cart", `Carrito ${cartCount ? `(${cartCount})` : ""}`]
+  const primaryNav = [
+    ["home", "Inicio", "home"],
+    ["catalog", "Catalogo", "catalog"]
   ];
+  const actionNav = [
+    ["account", "Mi cuenta", "user", 0],
+    ["wishlist", "Favoritos", "heart", wishlistCount],
+    ["cart", "Carrito", "cart", cartCount]
+  ];
+  const goTo = (key) => {
+    setPage(key);
+    setOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#ead3d4]/60 bg-white/90 backdrop-blur-xl">
@@ -39,38 +134,63 @@ function Header({ page, setPage, cartCount, wishlistCount }) {
         Boutique de joyeria seleccionada - envio cuidado - regalo listo desde el primer clic
       </div>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <button onClick={() => setPage("home")} className="focus-ring text-left">
+        <button onClick={() => goTo("home")} className="focus-ring text-left">
           <span className="serif block text-3xl font-bold tracking-normal">Atelier Eclat</span>
           <span className="text-xs uppercase tracking-[0.28em] text-rosewood">bijoux boutique</span>
         </button>
-        <nav className="hidden items-center gap-1 lg:flex">
-          {nav.map(([key, label]) => (
-            <Button key={key} variant={page === key ? "secondary" : "ghost"} onClick={() => setPage(key)}>
+        <nav className="hidden items-center gap-2 lg:flex" aria-label="Navegacion principal">
+          {primaryNav.map(([key, label, icon]) => (
+            <Button key={key} variant={page === key ? "secondary" : "ghost"} onClick={() => goTo(key)}>
+              <Icon name={icon} className="h-4 w-4" />
               {label}
             </Button>
           ))}
         </nav>
-        <button
-          className="focus-ring rounded-full border border-champagne/40 px-4 py-2 text-sm font-semibold lg:hidden"
-          onClick={() => setOpen((value) => !value)}
-          aria-label="Abrir menu"
-        >
-          Menu
-        </button>
+        <div className="flex items-center gap-2">
+          <div className="hidden items-center gap-2 sm:flex">
+            {actionNav.map(([key, label, icon, count]) => (
+              <IconButton
+                key={key}
+                icon={icon}
+                label={label}
+                count={count}
+                active={page === key}
+                pulse={key === "cart" && cartPulse}
+                onClick={() => goTo(key)}
+              />
+            ))}
+          </div>
+          <IconButton
+            icon="cart"
+            label="Carrito"
+            count={cartCount}
+            active={page === "cart"}
+            pulse={cartPulse}
+            onClick={() => goTo("cart")}
+            className="sm:hidden"
+          />
+          <button
+            className="focus-ring icon-button lg:hidden"
+            onClick={() => setOpen((value) => !value)}
+            aria-label={open ? "Cerrar menu" : "Abrir menu"}
+            title={open ? "Cerrar menu" : "Abrir menu"}
+          >
+            <Icon name={open ? "close" : "menu"} />
+          </button>
+        </div>
       </div>
       {open && (
         <div className="border-t border-champagne/20 px-4 pb-4 lg:hidden">
           <div className="grid gap-2">
-            {nav.map(([key, label]) => (
+            {[...primaryNav, ...actionNav].map(([key, label, icon, count]) => (
               <Button
                 key={key}
                 variant={page === key ? "secondary" : "ghost"}
-                onClick={() => {
-                  setPage(key);
-                  setOpen(false);
-                }}
+                className="justify-between"
+                onClick={() => goTo(key)}
               >
-                {label}
+                <span className="flex items-center gap-2"><Icon name={icon} className="h-4 w-4" />{label}</span>
+                {count > 0 && <span className="rounded-full bg-[#5b2e35] px-2 py-0.5 text-xs text-white">{count}</span>}
               </Button>
             ))}
           </div>
@@ -122,16 +242,22 @@ function Hero({ setPage }) {
   );
 }
 
-function Toast({ notice, onClose }) {
+function Toast({ notice, onClose, onViewCart }) {
   if (!notice) return null;
   return (
-    <div className="fixed bottom-5 left-1/2 z-[60] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-lg border border-champagne/30 bg-white p-4 shadow-soft">
+    <div className="toast-pop fixed bottom-5 left-1/2 z-[60] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-lg border border-champagne/30 bg-white p-4 shadow-soft">
       <div className="flex items-center justify-between gap-4">
-        <div>
+        <div className="flex items-start gap-3">
+          <span className="rounded-full bg-[#5b2e35] p-2 text-white"><Icon name="bag" className="h-4 w-4" /></span>
+          <div>
           <p className="text-sm font-bold">{notice}</p>
           <p className="mt-1 text-xs text-ink/58">Tu seleccion se ha guardado. Puedes finalizar cuando quieras.</p>
+          </div>
         </div>
-        <button className="focus-ring rounded-full bg-pearl px-3 py-1 text-sm font-semibold" onClick={onClose}>Cerrar</button>
+        <div className="flex shrink-0 items-center gap-2">
+          <button className="focus-ring rounded-full bg-[#5b2e35] px-3 py-1 text-sm font-semibold text-white" onClick={onViewCart}>Ver</button>
+          <button className="focus-ring rounded-full bg-pearl px-3 py-1 text-sm font-semibold" onClick={onClose} aria-label="Cerrar aviso">Cerrar</button>
+        </div>
       </div>
     </div>
   );
@@ -162,13 +288,14 @@ function ProductCard({ product, onAddCart, onDetails, onWishlist, isWishlisted }
           <img className="product-image w-full transition duration-700 group-hover:scale-105" src={product.image} alt={product.name} />
         )}
         <button
-          className={`focus-ring absolute right-3 top-3 rounded-full px-3 py-2 text-sm shadow-soft transition ${
+          className={`focus-ring absolute right-3 top-3 flex items-center gap-2 rounded-full px-3 py-2 text-sm shadow-soft transition ${
             isWishlisted ? "bg-[#5b2e35] text-white" : "bg-white/92 text-ink hover:bg-white"
           }`}
           onClick={() => onWishlist(product)}
           aria-label="Guardar en wishlist"
         >
-          {isWishlisted ? "Favorito" : "Guardar"}
+          <Icon name="heart" className="h-4 w-4" />
+          <span className="hidden sm:inline">{isWishlisted ? "Favorito" : "Guardar"}</span>
         </button>
         {product.isNew && (
           <span className="absolute left-3 top-3 rounded-full bg-blush px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-ink">
@@ -210,8 +337,8 @@ function ProductCard({ product, onAddCart, onDetails, onWishlist, isWishlisted }
           </a>
         )}
         <div className="mt-5 grid gap-2 sm:grid-cols-2">
-          <Button variant="gold" onClick={() => onAddCart(product)}>Anadir al carrito</Button>
-          <Button variant="secondary" onClick={() => onDetails(product)}>Ver detalles</Button>
+          <Button variant="gold" onClick={() => onAddCart(product)}><Icon name="cart" className="h-4 w-4" />Anadir al carrito</Button>
+          <Button variant="secondary" onClick={() => onDetails(product)}><Icon name="sparkle" className="h-4 w-4" />Ver detalles</Button>
         </div>
       </div>
     </article>
@@ -235,7 +362,7 @@ function SpecialOffer({ setPage, onAddCart, onDetails }) {
             <span className="rounded-full bg-white/10 px-4 py-2">Envio gratis</span>
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button variant="gold" onClick={() => onAddCart(offer)}>Anadir oferta</Button>
+            <Button variant="gold" onClick={() => onAddCart(offer)}><Icon name="cart" className="h-4 w-4" />Anadir oferta</Button>
             <Button variant="secondary" onClick={() => onDetails(offer)}>Ver detalles</Button>
           </div>
         </div>
@@ -455,7 +582,7 @@ function Catalog({ onAddCart, onDetails, onWishlist, wishlist }) {
         </SectionTitle>
         <div className="boutique-card mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg px-5 py-4">
           <p className="text-sm text-ink/64"><strong className="text-ink">{filtered.length}</strong> piezas disponibles. Menos ruido, mas acierto: piezas elegidas para regalar bien.</p>
-          <Button variant="gold" onClick={() => onAddCart(PRODUCTS[0])}>Anadir pack recomendado</Button>
+          <Button variant="gold" onClick={() => onAddCart(PRODUCTS[0])}><Icon name="cart" className="h-4 w-4" />Anadir pack recomendado</Button>
         </div>
         <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
           <Filters filters={filters} setFilters={setFilters} />
@@ -515,9 +642,10 @@ function ProductPage({ product, onAddCart, onBuy, onDetails, onWishlist, wishlis
                 onChange={(event) => setQty(Math.max(1, Number(event.target.value)))}
               />
             </label>
-            <Button variant="gold" onClick={() => onAddCart(product, qty)}>Anadir al carrito</Button>
+            <Button variant="gold" onClick={() => onAddCart(product, qty)}><Icon name="cart" className="h-4 w-4" />Anadir al carrito</Button>
             <Button variant="primary" onClick={() => onBuy(product, qty)}>Comprar ahora</Button>
             <Button variant="secondary" onClick={() => onWishlist(product)}>
+              <Icon name="heart" className="h-4 w-4" />
               {wishlist.some((item) => item.id === product.id) ? "En wishlist" : "Guardar"}
             </Button>
           </div>
@@ -763,6 +891,7 @@ function App() {
   const [cart, setCart] = useState(() => JSON.parse(localStorage.getItem("atelier-cart") || "[]"));
   const [wishlist, setWishlist] = useState(() => JSON.parse(localStorage.getItem("atelier-wishlist") || "[]"));
   const [notice, setNotice] = useState("");
+  const [cartPulse, setCartPulse] = useState(false);
 
   useEffect(() => localStorage.setItem("atelier-cart", JSON.stringify(cart)), [cart]);
   useEffect(() => localStorage.setItem("atelier-wishlist", JSON.stringify(wishlist)), [wishlist]);
@@ -785,6 +914,8 @@ function App() {
       return [...items, { ...product, qty }];
     });
     setNotice(`${product.name} anadido al carrito`);
+    setCartPulse(true);
+    window.setTimeout(() => setCartPulse(false), 900);
     window.setTimeout(() => setNotice(""), 2600);
   };
 
@@ -809,8 +940,16 @@ function App() {
 
   return (
     <>
-      <Header page={page} setPage={setPage} cartCount={cartCount} wishlistCount={wishlist.length} />
-      <Toast notice={notice} onClose={() => setNotice("")} />
+      <Header page={page} setPage={setPage} cartCount={cartCount} wishlistCount={wishlist.length} cartPulse={cartPulse} />
+      <Toast
+        notice={notice}
+        onClose={() => setNotice("")}
+        onViewCart={() => {
+          setNotice("");
+          setPage("cart");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
       {page === "home" && <Home setPage={setPage} onAddCart={onAddCart} onDetails={onDetails} onWishlist={onWishlist} wishlist={wishlist} />}
       {page === "catalog" && <Catalog onAddCart={onAddCart} onDetails={onDetails} onWishlist={onWishlist} wishlist={wishlist} />}
       {page === "product" && <ProductPage product={selectedProduct} onAddCart={onAddCart} onBuy={onBuy} onDetails={onDetails} onWishlist={onWishlist} wishlist={wishlist} />}
