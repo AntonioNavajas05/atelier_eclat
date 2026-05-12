@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Atelier Eclat, boutique online de joyas delicadas, elegantes y llenas de significado."
+    />
+    <title>Atelier Eclat | Joyas que iluminan tu historia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              pearl: "#fbf8f3",
+              champagne: "#d8b878",
+              blush: "#ead3d4",
+              sand: "#e8dfd1",
+              ink: "#171311",
+              rosewood: "#7b5351"
+            },
+            fontFamily: {
+              serif: ["Cormorant Garamond", "Georgia", "serif"],
+              sans: ["Inter", "Arial", "sans-serif"]
+            },
+            boxShadow: {
+              soft: "0 18px 55px rgba(23, 19, 17, 0.09)"
+            }
+          }
+        }
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body class="bg-pearl text-ink">
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel" data-presets="env,react" src="./src/data/products.js"></script>
+    <script type="text/babel" data-presets="env,react" src="./src/App.js"></script>
+  </body>
+</html>
+
