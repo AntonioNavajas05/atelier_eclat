@@ -617,6 +617,93 @@ function ConversionFunnel({ setPage, onAddCart, onDetails }) {
   );
 }
 
+function JewelTerminal({ onAddCart, onDetails }) {
+  const profiles = {
+    romantic: {
+      label: "Romantica",
+      query: "buscar --estilo romantico --brillo suave --significado alto",
+      match: PRODUCTS.find((product) => product.id === "charm-corazon-rosa") || PRODUCTS[0],
+      score: 96,
+      insight: "Detectado: le gustan los detalles con emocion, corazon y recuerdo personal."
+    },
+    gift: {
+      label: "Regalo seguro",
+      query: "analizar --objetivo regalo --riesgo bajo --packaging premium",
+      match: PRODUCTS.find((product) => product.id === "pack-pandora-cadena-charm") || PRODUCTS[0],
+      score: 98,
+      insight: "Detectado: prioridad en acertar rapido, presentar bonito y evitar dudas."
+    },
+    chic: {
+      label: "Chic diario",
+      query: "recomendar --uso diario --minimal --facil combinar",
+      match: PRODUCTS.find((product) => product.category === "pulseras") || PRODUCTS[1],
+      score: 91,
+      insight: "Detectado: quiere una pieza versatil que parezca elegante sin gritar."
+    }
+  };
+  const [profile, setProfile] = useState("gift");
+  const current = profiles[profile];
+  const lines = [
+    ["prompt", `atelier@eclat:~$ ${current.query}`],
+    ["scan", "leyendo intencion de compra... presupuesto, estilo, ocasion"],
+    ["match", current.insight],
+    ["score", `compatibilidad ${current.score}% -> ${current.match.name}`],
+    ["result", `joya recomendada: ${current.match.name} | ${formatPrice(current.match.price)}`]
+  ];
+
+  return (
+    <section className="terminal-section py-20">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
+        <div className="scroll-reveal">
+          <p className="text-sm font-bold uppercase tracking-[0.32em] text-[#ff7fc0]">Atelier Match Engine</p>
+          <h2 className="serif mt-3 text-4xl font-bold leading-tight text-white sm:text-6xl">
+            Una terminal que analiza tu joya ideal.
+          </h2>
+          <p className="mt-5 max-w-xl text-lg leading-8 text-white/70">
+            Un toque llamativo, casi hacker-luxury: convierte la eleccion en juego, reduce dudas y empuja a la usuaria hacia una recomendacion concreta.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            {Object.entries(profiles).map(([key, item]) => (
+              <button key={key} className={`terminal-chip ${profile === key ? "active" : ""}`} onClick={() => setProfile(key)}>
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="terminal-window scroll-reveal">
+          <div className="terminal-bar">
+            <span />
+            <span />
+            <span />
+            <p>atelier-match.sh</p>
+          </div>
+          <div className="terminal-body">
+            {lines.map(([type, text], index) => (
+              <p key={`${type}-${index}`} className={`terminal-line ${type}`}>
+                <span>{type}</span>
+                {text}
+              </p>
+            ))}
+            <div className="terminal-reco">
+              <img src={current.match.image} alt={current.match.name} />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#64ffd2]">Recomendacion final</p>
+                <h3 className="serif mt-1 text-3xl font-bold text-white">{current.match.name}</h3>
+                <p className="mt-1 text-sm text-white/60">{current.match.description}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button className="terminal-action primary" onClick={() => onAddCart(current.match)}>Añadir al carrito</button>
+                  <button className="terminal-action" onClick={() => onDetails(current.match)}>Ver detalles</button>
+                </div>
+              </div>
+            </div>
+            <p className="terminal-cursor">analisis completado <span>█</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ReferralEngine() {
   const steps = [
     ["1", "Publica 3 videos UGC", "Unboxing, regalo sorpresa y comparativa de packs. Nada caro: movil, luz natural y prueba real."],
@@ -736,6 +823,7 @@ function Home({ setPage, onAddCart, onDetails, onWishlist, wishlist }) {
     <main className="fade-in">
       <Hero setPage={setPage} />
       <ConversionFunnel setPage={setPage} onAddCart={onAddCart} onDetails={onDetails} />
+      <JewelTerminal onAddCart={onAddCart} onDetails={onDetails} />
       <section className="border-y border-[#ead3d4]/70 bg-white">
         <div className="mx-auto grid max-w-7xl gap-3 px-4 py-4 text-center text-sm font-semibold text-ink/70 sm:grid-cols-4 sm:px-6 lg:px-8">
           {trustPoints.map((point) => <span key={point}>{point}</span>)}
