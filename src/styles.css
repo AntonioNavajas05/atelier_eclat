@@ -93,6 +93,118 @@ textarea {
   box-shadow: 0 24px 70px rgba(91, 46, 53, 0.13);
 }
 
+.brand-lockup {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-seal {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.96), transparent 34%),
+    linear-gradient(145deg, #fffaf8, #f1dfdf);
+  box-shadow: 0 14px 36px rgba(91, 46, 53, 0.12), inset 0 0 0 1px rgba(216, 184, 120, 0.18);
+}
+
+.brand-seal-svg {
+  width: 50px;
+  height: 50px;
+}
+
+.brand-copy {
+  display: grid;
+  gap: 1px;
+}
+
+.brand-name {
+  display: block;
+  color: var(--ink);
+  font-size: clamp(1.55rem, 2.5vw, 2.25rem);
+  font-weight: 700;
+  line-height: 0.9;
+}
+
+.brand-subtitle {
+  color: var(--burgundy);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.gem-stage {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  perspective: 520px;
+}
+
+.gem-stage::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 34px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(184, 137, 141, 0.22);
+  filter: blur(7px);
+  transform: translateX(-50%);
+}
+
+.gem-3d {
+  position: absolute;
+  inset: 8px;
+  transform-style: preserve-3d;
+  animation: gemSpin 5.4s linear infinite;
+}
+
+.gem-face {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%);
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.18) 22%, transparent 38%),
+    linear-gradient(145deg, rgba(255, 225, 235, 0.92), rgba(232, 165, 188, 0.82) 52%, rgba(186, 117, 145, 0.72));
+  box-shadow: inset -10px -12px 22px rgba(91, 46, 53, 0.13), inset 8px 8px 18px rgba(255, 255, 255, 0.38);
+}
+
+.gem-face.front {
+  transform: translateZ(12px);
+}
+
+.gem-face.back {
+  transform: rotateY(180deg) translateZ(12px);
+  opacity: 0.74;
+}
+
+.gem-face.left {
+  transform: rotateY(-72deg) translateZ(12px);
+  opacity: 0.86;
+}
+
+.gem-face.right {
+  transform: rotateY(72deg) translateZ(12px);
+  opacity: 0.86;
+}
+
+.gem-face.top {
+  transform: rotateX(72deg) translateZ(12px);
+  opacity: 0.9;
+}
+
+.gem-face.bottom {
+  transform: rotateX(-72deg) translateZ(12px);
+  opacity: 0.58;
+}
+
 .icon-button {
   position: relative;
   display: inline-flex;
@@ -336,6 +448,15 @@ textarea {
   }
 }
 
+@keyframes gemSpin {
+  from {
+    transform: rotateX(-14deg) rotateY(0deg) rotateZ(4deg);
+  }
+  to {
+    transform: rotateX(-14deg) rotateY(360deg) rotateZ(4deg);
+  }
+}
+
 @keyframes chatRise {
   from {
     opacity: 0;
@@ -348,6 +469,33 @@ textarea {
 }
 
 @media (max-width: 640px) {
+  .brand-lockup {
+    gap: 9px;
+  }
+
+  .brand-seal {
+    width: 46px;
+    height: 46px;
+  }
+
+  .brand-seal-svg {
+    width: 41px;
+    height: 41px;
+  }
+
+  .brand-name {
+    font-size: 1.42rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+  }
+
+  .gem-stage {
+    display: none;
+  }
+
   .ai-chat {
     bottom: 14px;
     right: 14px;
