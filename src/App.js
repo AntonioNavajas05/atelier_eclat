@@ -92,6 +92,13 @@ function Icon({ name, className = "h-5 w-5" }) {
         <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z" />
         <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z" />
       </>
+    ),
+    chat: (
+      <>
+        <path d="M5 5.5h14a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-7l-5 3v-3H5a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3Z" />
+        <path d="M8 10.5h8" />
+        <path d="M8 13.5h5" />
+      </>
     )
   };
   return <svg {...common}>{paths[name]}</svg>;
@@ -849,6 +856,146 @@ function Wishlist({ wishlist, onAddCart, onDetails, onWishlist }) {
   );
 }
 
+function pickProducts(message) {
+  const text = message.toLowerCase();
+  const maxPrice = text.includes("50") ? 50 : text.includes("80") ? 80 : text.includes("100") ? 100 : text.includes("150") ? 150 : 999;
+  const categoryMap = [
+    ["pulsera", "pulseras"],
+    ["pulseras", "pulseras"],
+    ["charm", "charms"],
+    ["charms", "charms"],
+    ["anillo", "anillos"],
+    ["anillos", "anillos"],
+    ["collar", "collares"],
+    ["cadena", "collares"],
+    ["pendiente", "pendientes"],
+    ["pendientes", "pendientes"],
+    ["set", "sets de regalo"],
+    ["regalo", "sets de regalo"]
+  ];
+  const category = categoryMap.find(([word]) => text.includes(word))?.[1];
+  const emotional = text.includes("romant") || text.includes("corazon") || text.includes("pareja") || text.includes("novia");
+  const gift = text.includes("regalo") || text.includes("cumple") || text.includes("madre") || text.includes("amiga") || text.includes("hermana");
+  let matches = PRODUCTS.filter((product) => product.price <= maxPrice);
+  if (category) matches = matches.filter((product) => product.category === category);
+  if (emotional) matches = matches.filter((product) => `${product.name} ${product.description}`.toLowerCase().includes("corazon") || product.category === "sets de regalo");
+  if (!matches.length && gift) matches = PRODUCTS.filter((product) => product.bestSeller || product.category === "sets de regalo");
+  if (!matches.length) matches = PRODUCTS.filter((product) => product.bestSeller || product.isNew);
+  return matches.slice(0, 3);
+}
+
+function buildAssistantReply(message) {
+  const text = message.toLowerCase();
+  const picks = pickProducts(message);
+  const isGift = text.includes("regalo") || text.includes("cumple") || text.includes("madre") || text.includes("amiga") || text.includes("hermana");
+  const isBudget = text.includes("barato") || text.includes("precio") || text.includes("presupuesto") || /\b(50|80|100|150)\b/.test(text);
+  const isRomantic = text.includes("romant") || text.includes("corazon") || text.includes("novia") || text.includes("pareja");
+  const lead = isGift
+    ? "Para regalar sin fallar, iria a piezas con significado claro, packaging bonito y precio facil de justificar."
+    : isRomantic
+      ? "Si buscas algo romantico, lo mejor es una pieza con corazon o un set que ya cuente una historia completa."
+      : isBudget
+        ? "Con presupuesto definido, elegiria una pieza versatil antes que algo demasiado llamativo: se usa mas y parece mas premium."
+        : "Te ayudo encantada. Por lo que me cuentas, estas opciones tienen buen equilibrio entre delicadeza, deseo de compra y acierto.";
+  return {
+    text: `${lead} Mis favoritas ahora: ${picks.map((product) => product.name).join(", ")}.`,
+    products: picks
+  };
+}
+
+function AiStylistChat({ onAddCart, onDetails }) {
+  const [open, setOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([
+    {
+      role: "assistant",
+      text: "Hola, soy tu asesora Atelier. Dime si buscas un regalo, algo romantico, una pulsera con charms o un presupuesto concreto y te recomiendo piezas.",
+      products: PRODUCTS.filter((product) => product.bestSeller).slice(0, 2)
+    }
+  ]);
+  const quickPrompts = ["Regalo para mi amiga", "Algo romantico", "Menos de 80 euros", "Pulsera con charm"];
+
+  const sendMessage = (value = input) => {
+    const clean = value.trim();
+    if (!clean) return;
+    const reply = buildAssistantReply(clean);
+    setMessages((items) => [...items, { role: "user", text: clean }, { role: "assistant", ...reply }]);
+    setInput("");
+    setOpen(true);
+  };
+
+  return (
+    <div className="ai-chat">
+      {open && (
+        <section className="ai-chat-panel" aria-label="Asesora de compra Atelier">
+          <div className="flex items-start justify-between gap-4 border-b border-champagne/20 p-4">
+            <div>
+              <p className="serif text-2xl font-bold">Asesora Atelier</p>
+              <p className="text-xs text-ink/58">Recomendaciones rapidas segun tu estilo</p>
+            </div>
+            <button className="focus-ring icon-button" onClick={() => setOpen(false)} aria-label="Cerrar chat">
+              <Icon name="close" className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="ai-chat-body">
+            {messages.map((message, index) => (
+              <div key={`${message.role}-${index}`} className={`ai-message ${message.role}`}>
+                <p>{message.text}</p>
+                {message.products?.length > 0 && (
+                  <div className="mt-3 grid gap-2">
+                    {message.products.map((product) => (
+                      <article key={product.id} className="ai-product">
+                        <img src={product.image} alt={product.name} />
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-bold">{product.name}</p>
+                          <p className="text-xs text-ink/58">{formatPrice(product.price)}</p>
+                          <div className="mt-2 flex gap-2">
+                            <button className="ai-mini-button" onClick={() => onDetails(product)}>Ver</button>
+                            <button className="ai-mini-button dark" onClick={() => onAddCart(product)}>Anadir</button>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-champagne/20 p-4">
+            <div className="mb-3 flex flex-wrap gap-2">
+              {quickPrompts.map((prompt) => (
+                <button key={prompt} className="ai-chip" onClick={() => sendMessage(prompt)}>
+                  {prompt}
+                </button>
+              ))}
+            </div>
+            <form
+              className="flex gap-2"
+              onSubmit={(event) => {
+                event.preventDefault();
+                sendMessage();
+              }}
+            >
+              <input
+                className="focus-ring min-w-0 flex-1 rounded-full border border-champagne/30 bg-pearl px-4 py-3 text-sm"
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder="Ej: quiero un regalo elegante por 80 euros"
+                aria-label="Mensaje para la asesora"
+              />
+              <button className="focus-ring rounded-full bg-[#5b2e35] px-4 py-3 text-sm font-bold text-white">Enviar</button>
+            </form>
+          </div>
+        </section>
+      )}
+      <button className="ai-chat-launch focus-ring" onClick={() => setOpen((value) => !value)} aria-label="Abrir asesora IA">
+        <Icon name={open ? "close" : "chat"} />
+        {!open && <span>Asesora</span>}
+      </button>
+    </div>
+  );
+}
+
 function Footer({ setPage }) {
   const links = [
     ["home", "Inicio"],
@@ -957,6 +1104,7 @@ function App() {
       {page === "checkout" && <Checkout cart={cart} />}
       {page === "account" && <Account />}
       {page === "wishlist" && <Wishlist wishlist={wishlist} onAddCart={onAddCart} onDetails={onDetails} onWishlist={onWishlist} />}
+      <AiStylistChat onAddCart={onAddCart} onDetails={onDetails} />
       <Footer setPage={setPage} />
     </>
   );
