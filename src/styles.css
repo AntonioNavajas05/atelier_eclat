@@ -1,0 +1,140 @@
+:root {
+  color-scheme: light;
+  --pearl: #fbf8f3;
+  --gold: #d8b878;
+  --blush: #ead3d4;
+  --sand: #e8dfd1;
+  --ink: #171311;
+  --burgundy: #5b2e35;
+  --mauve: #b8898d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", Arial, sans-serif;
+  background:
+    linear-gradient(180deg, #fffaf8 0%, #fbf8f3 34%, #ffffff 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.serif {
+  font-family: "Cormorant Garamond", Georgia, serif;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(184, 137, 141, 0.22);
+  backdrop-filter: blur(18px);
+}
+
+.fade-in {
+  animation: fadeIn 0.65s ease both;
+}
+
+.soft-rise {
+  animation: softRise 0.75s ease both;
+}
+
+.product-image {
+  aspect-ratio: 4 / 5;
+  background: #fff;
+  object-fit: contain;
+  padding: clamp(1rem, 4vw, 2.5rem);
+}
+
+.price-strike {
+  color: rgba(23, 19, 17, 0.42);
+  text-decoration: line-through;
+}
+
+.offer-glow {
+  background:
+    linear-gradient(135deg, rgba(91, 46, 53, 0.98) 0%, rgba(126, 73, 79, 0.96) 48%, rgba(232, 205, 207, 0.98) 100%);
+}
+
+.hero-media {
+  background-image:
+    linear-gradient(90deg, rgba(91, 46, 53, 0.82) 0%, rgba(91, 46, 53, 0.58) 38%, rgba(255, 250, 248, 0.18) 100%),
+    url("https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1800&q=88");
+  background-position: center right;
+  background-size: cover;
+}
+
+.boutique-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fff8f7 100%);
+  border: 1px solid rgba(216, 184, 120, 0.22);
+  box-shadow: 0 22px 70px rgba(91, 46, 53, 0.09);
+}
+
+.chic-band {
+  background:
+    linear-gradient(90deg, #fff 0%, #fff5f5 45%, #fbf8f3 100%);
+}
+
+.product-card {
+  box-shadow: 0 16px 45px rgba(91, 46, 53, 0.07);
+}
+
+.product-card:hover {
+  box-shadow: 0 24px 70px rgba(91, 46, 53, 0.13);
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.scroll-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid rgba(216, 184, 120, 0.5);
+  outline-offset: 3px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes softRise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
