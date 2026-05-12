@@ -126,85 +126,99 @@ function RotatingGem() {
     const canvas = canvasRef.current;
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(78, 78, false);
+    renderer.setSize(96, 96, false);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.18;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-    camera.position.set(0, 0.08, 5.8);
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+    camera.position.set(0, 0.02, 5.2);
 
     const group = new THREE.Group();
     scene.add(group);
 
-    const top = 0.92;
-    const girdle = 0.2;
-    const bottom = -1.18;
-    const tableRadius = 0.58;
-    const girdleRadius = 1.42;
-    const segments = 10;
-    const vertices = [];
-    const faces = [];
+    const baseGeometry = new THREE.IcosahedronGeometry(1.26, 2);
+    const geometry = baseGeometry.toNonIndexed();
+    baseGeometry.dispose();
+    const positions = geometry.attributes.position;
+    const colors = [];
+    const colorChoices = [0xffd6e2, 0xf7b9cd, 0xe89bb8, 0xffe7ee, 0xd98aa9, 0xf4c8d6];
 
-    for (let i = 0; i < segments; i += 1) {
-      const angle = (i / segments) * Math.PI * 2 + Math.PI / segments;
-      vertices.push(Math.cos(angle) * tableRadius, top, Math.sin(angle) * tableRadius);
-    }
-    for (let i = 0; i < segments; i += 1) {
-      const angle = (i / segments) * Math.PI * 2;
-      vertices.push(Math.cos(angle) * girdleRadius, girdle, Math.sin(angle) * girdleRadius);
-    }
-    vertices.push(0, bottom, 0);
-    const pointIndex = segments * 2;
-
-    for (let i = 1; i < segments - 1; i += 1) faces.push(0, i, i + 1);
-    for (let i = 0; i < segments; i += 1) {
-      const next = (i + 1) % segments;
-      faces.push(i, segments + i, segments + next);
-      faces.push(i, segments + next, next);
-      faces.push(segments + i, pointIndex, segments + next);
+    for (let i = 0; i < positions.count; i += 1) {
+      const x = positions.getX(i);
+      const y = positions.getY(i);
+      const z = positions.getZ(i);
+      const softCut = 1 + Math.sin(x * 2.7 + z * 1.9) * 0.045;
+      positions.setXYZ(i, x * 1.06 * softCut, y * 0.82 + Math.sin(x * 3.1) * 0.05, z * 0.96 * softCut);
     }
 
-    const geometry = new THREE.BufferGeometry();
-    geometry.setIndex(faces);
-    geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+    for (let i = 0; i < positions.count; i += 3) {
+      const color = new THREE.Color(colorChoices[(i / 3) % colorChoices.length]);
+      const lift = 0.9 + ((i / 3) % 5) * 0.045;
+      color.multiplyScalar(lift);
+      for (let j = 0; j < 3; j += 1) colors.push(color.r, color.g, color.b);
+    }
+    geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
     geometry.computeVertexNormals();
 
     const gemMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xf6bfd1,
-      roughness: 0.16,
+      vertexColors: true,
+      roughness: 0.34,
       metalness: 0,
-      transmission: 0.38,
-      thickness: 1.05,
-      ior: 1.72,
+      transmission: 0.18,
+      thickness: 0.82,
+      ior: 1.54,
       transparent: true,
-      opacity: 0.86,
-      clearcoat: 1,
-      clearcoatRoughness: 0.08,
+      opacity: 0.94,
+      clearcoat: 0.85,
+      clearcoatRoughness: 0.18,
       specularIntensity: 1,
-      specularColor: 0xffffff
+      specularColor: 0xfff4f8,
+      flatShading: true
     });
     const gem = new THREE.Mesh(geometry, gemMaterial);
-    gem.rotation.x = -0.32;
+    gem.rotation.set(-0.42, 0.18, -0.08);
     group.add(gem);
 
-    const edgeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.34 });
-    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geometry, 16), edgeMaterial);
+    const edgeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.28 });
+    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geometry, 18), edgeMaterial);
     edges.rotation.copy(gem.rotation);
     group.add(edges);
 
-    const glintGeometry = new THREE.SphereGeometry(0.08, 16, 16);
-    const glintMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 });
-    const glint = new THREE.Mesh(glintGeometry, glintMaterial);
-    glint.position.set(-0.38, 0.72, 0.75);
-    group.add(glint);
+    const haloGeometry = new THREE.SphereGeometry(1.31, 32, 32);
+    const haloMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffc8d8,
+      transparent: true,
+      opacity: 0.08,
+      depthWrite: false
+    });
+    const halo = new THREE.Mesh(haloGeometry, haloMaterial);
+    halo.scale.set(1.12, 0.88, 1);
+    group.add(halo);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 1.15));
-    const key = new THREE.DirectionalLight(0xffffff, 2.4);
-    key.position.set(3, 4, 5);
+    const glints = [
+      [-0.42, 0.48, 0.84, 0.075],
+      [0.28, 0.2, 0.98, 0.052],
+      [0.55, -0.18, 0.78, 0.038]
+    ].map(([x, y, z, size]) => {
+      const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(size, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.88 })
+      );
+      mesh.position.set(x, y, z);
+      group.add(mesh);
+      return mesh;
+    });
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xf1abc2, 2.35));
+    const key = new THREE.DirectionalLight(0xffffff, 3.1);
+    key.position.set(3.5, 4.2, 5);
     scene.add(key);
-    const pink = new THREE.PointLight(0xffb6cf, 3.2, 7);
-    pink.position.set(-2.4, 1.4, 2.8);
+    const pink = new THREE.PointLight(0xff9fbe, 4.2, 7);
+    pink.position.set(-2.8, 1.2, 2.4);
     scene.add(pink);
-    const gold = new THREE.PointLight(0xffdf9e, 1.1, 7);
+    const gold = new THREE.PointLight(0xffdf9e, 1.45, 7);
     gold.position.set(2, -1, 2.5);
     scene.add(gold);
 
@@ -212,10 +226,13 @@ function RotatingGem() {
     let raf = 0;
     const animate = () => {
       frame += 0.012;
-      group.rotation.y += 0.018;
-      group.rotation.x = Math.sin(frame) * 0.08;
+      group.rotation.y += 0.014;
+      group.rotation.x = Math.sin(frame) * 0.075 - 0.05;
       group.position.y = Math.sin(frame * 1.6) * 0.035;
-      glint.scale.setScalar(0.8 + Math.sin(frame * 3.2) * 0.28);
+      halo.rotation.y -= 0.006;
+      glints.forEach((glint, index) => {
+        glint.scale.setScalar(0.72 + Math.sin(frame * 3.1 + index) * 0.22);
+      });
       renderer.render(scene, camera);
       raf = requestAnimationFrame(animate);
     };
@@ -226,15 +243,19 @@ function RotatingGem() {
       geometry.dispose();
       edgeMaterial.dispose();
       gemMaterial.dispose();
-      glintGeometry.dispose();
-      glintMaterial.dispose();
+      haloGeometry.dispose();
+      haloMaterial.dispose();
+      glints.forEach((glint) => {
+        glint.geometry.dispose();
+        glint.material.dispose();
+      });
       renderer.dispose();
     };
   }, []);
 
   return (
     <span className="gem-canvas-stage" aria-hidden="true">
-      <canvas ref={canvasRef} width="78" height="78" />
+      <canvas ref={canvasRef} width="96" height="96" />
     </span>
   );
 }
