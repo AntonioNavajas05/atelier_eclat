@@ -308,7 +308,7 @@ function Header({ page, setPage, cartCount, wishlistCount, cartPulse }) {
   return (
     <header className="sticky top-0 z-50 border-b border-[#ead3d4]/60 bg-white/90 backdrop-blur-xl">
       <div className="bg-[#5b2e35] px-4 py-2 text-center text-xs font-semibold uppercase tracking-[0.22em] text-white">
-        Boutique de joyeria seleccionada - envio cuidado - regalo listo desde el primer clic
+        Lanzamiento Atelier - packs regalo con ahorro, packaging premium y compra guiada en 2 minutos
       </div>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <button onClick={() => goTo("home")} className="focus-ring text-left" aria-label="Atelier Eclat inicio">
@@ -554,6 +554,96 @@ function SpecialOffer({ setPage, onAddCart, onDetails }) {
   );
 }
 
+function ConversionFunnel({ setPage, onAddCart, onDetails }) {
+  const heroPack = PRODUCTS.find((product) => product.id === "pack-pandora-cadena-charm") || PRODUCTS[0];
+  const pathways = [
+    ["Regalo seguro", "Para novia, amiga, hermana o madre. Pack listo para acertar sin preguntar demasiado."],
+    ["Presupuesto claro", "Elige por menos de 80 €, 100 € o pack completo. Menos dudas, compra mas rapida."],
+    ["Compra con confianza", "Fuente oficial visible, resumen claro, packaging regalo y asesor IA para decidir."]
+  ];
+  return (
+    <section className="conversion-lab py-16">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
+        <div className="scroll-reveal">
+          <p className="text-sm font-bold uppercase tracking-[0.32em] text-rosewood">Oferta de entrada</p>
+          <h2 className="serif mt-3 text-4xl font-bold leading-tight sm:text-6xl">
+            Compra menos producto. Vende mejor el regalo.
+          </h2>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-ink/68">
+            La oportunidad no esta en competir por precio: esta en vender una decision facil. Atelier Eclat convierte piezas sueltas en packs con significado, asesoramiento y presentacion lista para regalar.
+          </p>
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            {pathways.map(([title, copy]) => (
+              <div key={title} className="rounded-lg border border-champagne/25 bg-white/82 p-4">
+                <p className="font-bold">{title}</p>
+                <p className="mt-2 text-sm leading-6 text-ink/62">{copy}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Button variant="primary" onClick={() => setPage("catalog")}>Ver packs que convierten</Button>
+            <Button variant="secondary" onClick={() => onDetails(heroPack)}>Analizar pack estrella</Button>
+          </div>
+        </div>
+        <aside className="growth-offer-card scroll-reveal">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-rosewood">Pack con mayor potencial</p>
+              <h3 className="serif mt-2 text-4xl font-bold">{heroPack.name}</h3>
+            </div>
+            <span className="rounded-full bg-[#5b2e35] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-white">Regalo</span>
+          </div>
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            {(heroPack.bundleImages || [heroPack.image]).map((image) => (
+              <img key={image} className="aspect-square rounded-lg bg-white object-contain p-4 shadow-sm" src={image} alt={heroPack.name} />
+            ))}
+          </div>
+          <div className="mt-5 rounded-lg bg-white p-4">
+            <div className="flex items-baseline justify-between gap-4">
+              <span className="text-sm text-ink/58">Precio psicologico</span>
+              <strong className="text-2xl">{formatPrice(heroPack.price)}</strong>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-ink/62">
+              Ideal para trafico frio: visual claro, ahorro visible, regalo completo y argumento emocional inmediato.
+            </p>
+          </div>
+          <div className="mt-5 grid gap-2 sm:grid-cols-2">
+            <Button variant="gold" onClick={() => onAddCart(heroPack)}><Icon name="cart" className="h-4 w-4" />Probar oferta</Button>
+            <Button variant="secondary" onClick={() => onDetails(heroPack)}>Ver detalles</Button>
+          </div>
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function ReferralEngine() {
+  const steps = [
+    ["1", "Publica 3 videos UGC", "Unboxing, regalo sorpresa y comparativa de packs. Nada caro: movil, luz natural y prueba real."],
+    ["2", "Captura interes", "La asesora IA y la newsletter convierten visitas frias en decisiones guiadas."],
+    ["3", "Referidos", "Cada compradora recibe un incentivo para traer a una amiga: descuento pequeno, efecto compuesto."],
+    ["4", "Reinvierte", "Los primeros beneficios vuelven a contenido y retargeting, no a inventario grande."]
+  ];
+  return (
+    <section className="py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionTitle eyebrow="Modelo 50 a 2000" title="La estrategia es velocidad, no perfeccion">
+          Con poco presupuesto, la web debe probar oferta, captar datos y empujar packs de margen alto. Primero validacion, despues escala.
+        </SectionTitle>
+        <div className="grid gap-4 md:grid-cols-4">
+          {steps.map(([number, title, copy]) => (
+            <article key={title} className="growth-step scroll-reveal">
+              <span>{number}</span>
+              <h3 className="serif mt-4 text-2xl font-bold">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-ink/64">{copy}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ProductGrid({ products, onAddCart, onDetails, onWishlist, wishlist }) {
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -645,6 +735,7 @@ function Home({ setPage, onAddCart, onDetails, onWishlist, wishlist }) {
   return (
     <main className="fade-in">
       <Hero setPage={setPage} />
+      <ConversionFunnel setPage={setPage} onAddCart={onAddCart} onDetails={onDetails} />
       <section className="border-y border-[#ead3d4]/70 bg-white">
         <div className="mx-auto grid max-w-7xl gap-3 px-4 py-4 text-center text-sm font-semibold text-ink/70 sm:grid-cols-4 sm:px-6 lg:px-8">
           {trustPoints.map((point) => <span key={point}>{point}</span>)}
@@ -668,6 +759,7 @@ function Home({ setPage, onAddCart, onDetails, onWishlist, wishlist }) {
         </div>
       </section>
       <SpecialOffer setPage={setPage} onAddCart={onAddCart} onDetails={onDetails} />
+      <ReferralEngine />
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         <div className="boutique-card rounded-lg p-8 text-center scroll-reveal sm:p-12">
           <p className="serif text-4xl font-bold">Tu primera joya llega con un detalle extra</p>
